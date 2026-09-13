@@ -1,0 +1,37 @@
+{
+  "name": "invoice-agent",
+  "version": "1.0.0",
+  "description": "Multi-app AI invoice agent — Gmail, Sheets, Slack, mock payment",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "read:gmail": "tsx src/scripts/read-gmail.ts",
+    "track:invoices": "tsx src/scripts/track-invoices.ts",
+    "test:slack": "tsx src/test-slack.ts",
+    "test:slack-approval": "tsx src/test-slack-approval.ts",
+    "test:payment": "tsx src/scripts/test-payment.ts"
+  },
+  "keywords": [
+    "invoice",
+    "gmail",
+    "slack",
+    "sheets",
+    "agent"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@slack/socket-mode": "^3.0.1",
+    "@slack/web-api": "^8.1.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "googleapis": "^178.1.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}
