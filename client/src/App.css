@@ -864,6 +864,13 @@ code { color: var(--olive-char); font: 400 11px/17px var(--mono); }
 .invoice-pill.muted { color: var(--lichen); font-weight: 400; }
 .invoice-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
 .invoice-actions.compact { margin-bottom: 18px; }
+.invoice-auth-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  box-sizing: border-box;
+}
 .invoice-error { margin-bottom: 18px; padding: 12px 14px; border: 1px solid #d9b8b0; border-radius: 8px; background: #f8eeeb; color: #5c2f28; font: 400 12px/1.4 var(--mono); }
 .invoice-overview-grid { margin-top: 8px; margin-bottom: 24px; }
 .invoice-recent-table .table-head,

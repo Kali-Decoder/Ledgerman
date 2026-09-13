@@ -19,11 +19,13 @@ export type AgentInvoice = {
 export type AgentStatus = {
   ok: boolean
   gmail: boolean
+  gmailEmail?: string | null
   sheets: boolean
   slack: boolean
   socketMode: boolean
   channel: string
   spreadsheetId: string | null
+  authUrl?: string
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -49,6 +51,11 @@ export function getAgentBaseUrl() {
   return AGENT_URL
 }
 
+export function getGmailConnectUrl(next = '/demo') {
+  const params = new URLSearchParams({ next })
+  return `${AGENT_URL}/agent/auth/google?${params.toString()}`
+}
+
 export function fetchStatus() {
   return request<AgentStatus>('/agent/status')
 }
@@ -67,6 +74,13 @@ export function trackInvoices(body?: { query?: string; maxResults?: number }) {
   }>('/agent/track', {
     method: 'POST',
     body: JSON.stringify(body ?? {}),
+  })
+}
+
+export function disconnectGmail() {
+  return request<{ ok: boolean; gmail: boolean }>('/agent/auth/google/disconnect', {
+    method: 'POST',
+    body: '{}',
   })
 }
 
@@ -90,4 +104,3 @@ export function payInvoice(invoiceId: string) {
     body: JSON.stringify({ invoiceId }),
   })
 }
-

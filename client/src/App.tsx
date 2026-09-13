@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-import { fetchStatus, getAgentBaseUrl, type AgentStatus } from './agent-api'
+import { fetchStatus, getAgentBaseUrl, getGmailConnectUrl, type AgentStatus } from './agent-api'
 import {
   InvoiceListView,
   InvoiceOverviewSection,
@@ -178,7 +178,13 @@ function LandingPage({ onEnterDemo }: { onEnterDemo: () => void }) {
         <a href="#authority">Authority</a>
         <a href="#console">Console</a>
       </nav>
-      <div className="product-nav-actions"><button className="product-demo-link" onClick={onEnterDemo}>Open agent console <Icon name="arrow" size={14} /></button></div>
+      <div className="product-nav-actions">
+        {agentStatus?.gmail ? (
+          <button className="product-demo-link" onClick={onEnterDemo}>Open agent console <Icon name="arrow" size={14} /></button>
+        ) : (
+          <a className="product-demo-link" href={getGmailConnectUrl('/demo')}>Connect Gmail <Icon name="arrow" size={14} /></a>
+        )}
+      </div>
     </header>
 
     <main>
@@ -189,7 +195,11 @@ function LandingPage({ onEnterDemo }: { onEnterDemo: () => void }) {
           <p className="product-hero-lede">Ledgerman is Zoth’s invoice control plane. It reads Gmail, logs Google Sheets, asks Slack for approval, and settles vendor payments with Stripe — while release evidence decides what payment authority is allowed.</p>
           <div className="product-hero-actions">
             <button className="product-button product-button-primary" onClick={onEnterDemo}>Open agent console <Icon name="arrow" size={15} /></button>
-            <a className="product-button product-button-secondary" href="#pipeline">See the pipeline <Icon name="arrow" size={15} /></a>
+            {agentStatus?.gmail ? (
+              <button className="product-button product-button-secondary" onClick={onEnterDemo}>Track Gmail invoices <Icon name="arrow" size={15} /></button>
+            ) : (
+              <a className="product-button product-button-secondary" href={getGmailConnectUrl('/demo')}>Connect Gmail <Icon name="arrow" size={15} /></a>
+            )}
           </div>
           <div className="product-hero-note"><Icon name="lock" size={14} /> Human approval in Slack · bounded payment · release-bound capability</div>
         </div>
@@ -198,7 +208,7 @@ function LandingPage({ onEnterDemo }: { onEnterDemo: () => void }) {
           <div className="hero-card-top"><span>INVOICE PIPELINE</span><span className="hero-card-status"><i /> {agentStatus?.ok ? 'agent ready' : 'connect agent'}</span></div>
           <div className="hero-card-title">Gmail → Sheets → Slack → pay</div>
           <div className="hero-gate-list">
-            <div><span className="gate-check"><Icon name="check" size={11} /></span><span>Track invoice emails</span><b>Gmail</b></div>
+            <div><span className={`gate-check ${agentStatus?.gmail ? '' : 'gate-check-open'}`}>{agentStatus?.gmail ? <Icon name="check" size={11} /> : <Icon name="lock" size={11} />}</span><span>{agentStatus?.gmail ? 'Gmail connected' : 'Connect Gmail'}</span><b>{agentStatus?.gmailEmail ? agentStatus.gmailEmail.split('@')[0] : 'Gmail'}</b></div>
             <div><span className="gate-check"><Icon name="check" size={11} /></span><span>Extract vendor + amount</span><b>Sheets</b></div>
             <div><span className="gate-check"><Icon name="check" size={11} /></span><span>Approve or reject</span><b>Slack</b></div>
             <div><span className="gate-check gate-check-open"><Icon name="lock" size={11} /></span><span>Stripe settlement</span><b>{liveCapability?.status?.toLowerCase() ?? 'bounded'}</b></div>
