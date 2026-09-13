@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
 import {
+  disconnectGmail,
   fetchInvoices,
   fetchStatus,
   getAgentBaseUrl,
+  getGmailConnectUrl,
   payInvoice,
   sendApproval,
   trackInvoices,
@@ -273,8 +275,24 @@ export function useInvoiceWorkspace(): InvoiceWorkspaceState {
     startTransition(async () => {
       try {
         setError(null)
-        const [nextStatus, inv] = await Promise.all([fetchStatus(), fetchInvoices()])
+        const nextStatus = await fetchStatus()
         setStatus(nextStatus)
+
+        if (!nextStatus.gmail || !nextStatus.sheets) {
+          setInvoices([])
+          setLastRefreshAt(nowIso())
+          if (!silent) {
+            pushHistory({
+              kind: 'refresh',
+              action: 'Refresh',
+              detail: `Gmail ${nextStatus.gmail ? 'connected' : 'not connected'} · Sheets ${nextStatus.sheets ? 'ok' : 'missing'} · Slack ${nextStatus.slack ? 'ok' : 'missing'}`,
+              ok: true,
+            })
+          }
+          return
+        }
+
+        const inv = await fetchInvoices()
         setInvoices(inv.invoices)
         setLastRefreshAt(nowIso())
         setSelectedId((current) => current ?? inv.invoices[0]?.invoiceId ?? null)
@@ -302,6 +320,67 @@ export function useInvoiceWorkspace(): InvoiceWorkspaceState {
       detail: `Connected UI → ${getAgentBaseUrl()}`,
       ok: true,
     })
+  }, [pushHistory, refresh])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    const gmail = params.get('gmail')
+    if (!gmail) return
+
+    const handledKey = `ledgerman-gmail-${gmail}-${params.get('email') ?? ''}-${params.get('message') ?? ''}`
+    if (sessionStorage.getItem(handledKey) === '1') {
+      params.delete('gmail')
+      params.delete('email')
+      params.delete('message')
+      const cleaned = `${window.location.pathname}${params.toString() ? `?${params}` : ''}${window.location.hash}`
+      window.history.replaceState({}, '', cleaned)
+      return
+    }
+    sessionStorage.setItem(handledKey, '1')
+
+    const email = params.get('email')
+    const message = params.get('message')
+
+    if (gmail === 'connected') {
+      pushHistory({
+        kind: 'info',
+        action: 'Gmail connected',
+        detail: email ? `Authorized as ${email}` : 'Google account linked',
+        ok: true,
+      })
+      refresh(true)
+      startTransition(async () => {
+        try {
+          setError(null)
+          const result = await trackInvoices()
+          pushHistory({
+            kind: 'track',
+            action: 'Track Gmail → Sheets ✓',
+            detail: summarize(result),
+            ok: true,
+          })
+          const [inv, nextStatus] = await Promise.all([fetchInvoices(), fetchStatus()])
+          setInvoices(inv.invoices)
+          setStatus(nextStatus)
+          setLastRefreshAt(nowIso())
+        } catch (err) {
+          const detail = err instanceof Error ? err.message : 'Track failed after connect'
+          setError(detail)
+          pushHistory({ kind: 'error', action: 'Track after connect failed', detail, ok: false })
+        }
+      })
+    } else if (gmail === 'error') {
+      const detail = message || 'Gmail connection failed'
+      setError(detail)
+      pushHistory({ kind: 'error', action: 'Gmail connect failed', detail, ok: false })
+    }
+
+    params.delete('gmail')
+    params.delete('email')
+    params.delete('message')
+    const next = `${window.location.pathname}${params.toString() ? `?${params}` : ''}${window.location.hash}`
+    window.history.replaceState({}, '', next)
   }, [pushHistory, refresh])
 
   useEffect(() => {
@@ -395,6 +474,7 @@ function IntegrationPills({ status }: { status: AgentStatus | null }) {
           {label}
         </span>
       ))}
+      {status?.gmailEmail ? <span className="invoice-pill muted">{status.gmailEmail}</span> : null}
       {status?.channel ? <span className="invoice-pill muted">Channel {status.channel}</span> : null}
     </div>
   )
@@ -407,12 +487,38 @@ function PipelineActions({
   workspace: InvoiceWorkspaceState
   compact?: boolean
 }) {
-  const { pending, run, refresh } = workspace
+  const { pending, run, refresh, status } = workspace
+  const gmailConnected = Boolean(status?.gmail)
+
   return (
     <div className={`invoice-actions ${compact ? 'compact' : ''}`}>
-      <button className="primary-button" disabled={pending} onClick={() => run('track', 'Track Gmail → Sheets', () => trackInvoices())}>
-        <Icon name="mail" size={15} /> Track Gmail
-      </button>
+      {gmailConnected ? (
+        <>
+          <button
+            className="primary-button"
+            disabled={pending}
+            onClick={() => run('track', 'Track Gmail → Sheets', () => trackInvoices())}
+          >
+            <Icon name="mail" size={15} /> Track Gmail
+          </button>
+          <button
+            className="secondary-button"
+            disabled={pending}
+            onClick={() =>
+              run('info', 'Disconnect Gmail', async () => {
+                await disconnectGmail()
+                return { ok: true, gmail: false }
+              })
+            }
+          >
+            Disconnect
+          </button>
+        </>
+      ) : (
+        <a className="primary-button invoice-auth-link" href={getGmailConnectUrl('/demo')}>
+          <Icon name="lock" size={15} /> Connect Gmail
+        </a>
+      )}
       <button className="secondary-button" disabled={pending} onClick={() => refresh(false)}>
         <Icon name="refresh" size={15} /> Refresh
       </button>
@@ -446,7 +552,9 @@ export function InvoiceOverviewSection({
           <div className="eyebrow"><span className="eyebrow-line" /> LEDGERMAN / OVERVIEW</div>
           <h1>Zoth invoice control plane</h1>
           <p>
-            Gmail → Sheets → Slack → payment, bounded by release authority.
+            {status?.gmail
+              ? <>Gmail connected{status.gmailEmail ? <> as <strong>{status.gmailEmail}</strong></> : null}. Track emails into Sheets, then approve in Slack.</>
+              : <>Connect Gmail to authorize inbox access, then Track to fetch invoice emails into Sheets.</>}
             {lastRefreshAt ? <> · Last refresh <strong>{formatRelative(lastRefreshAt)}</strong></> : null}
           </p>
         </div>
@@ -513,7 +621,13 @@ export function InvoiceOverviewSection({
                 <StatusBadge status={row.status} />
               </button>
             ))}
-            {recentInvoices.length === 0 ? <div className="invoice-empty">No invoices yet. Track Gmail to pull invoice emails into Sheets.</div> : null}
+            {recentInvoices.length === 0 ? (
+              <div className="invoice-empty">
+                {status?.gmail
+                  ? 'No invoices yet. Track Gmail to pull invoice emails into Sheets.'
+                  : 'Connect Gmail first, then Track to fetch invoice emails into Sheets.'}
+              </div>
+            ) : null}
           </div>
         </div>
 

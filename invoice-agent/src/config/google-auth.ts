@@ -149,36 +149,33 @@ export async function getConnectedGmailEmail(): Promise<string | null> {
   }
 }
 
-async function authorizeWithBrowser(
-  client: OAuth2Client,
-  redirectUri: string
-): Promise<void> {
-  const authUrl = client.generateAuthUrl({
+async function authorizeWithBrowser(client: OAuth2Client): Promise<void> {
+  // Dedicated CLI listener — does not collide with Express on :3000.
+  const redirectUri = "http://localhost:3001/oauth2callback";
+  const { clientId, clientSecret } = await loadClientSecrets();
+  const oauth = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
+
+  const authUrl = oauth.generateAuthUrl({
     access_type: "offline",
     scope: GOOGLE_SCOPES,
     prompt: "consent",
   });
 
-  const redirect = new URL(redirectUri);
-  const listenPort = Number(redirect.port) || 3000;
-  const callbackPath = redirect.pathname || "/agent/auth/google/callback";
-
   console.log("\n>>> Open this URL to authorize:\n");
   console.log(authUrl);
   console.log(
-    `\nIf you see redirect_uri_mismatch, add this in Cloud Console:\n  ${redirectUri}\n`
+    `\nIf you see redirect_uri_mismatch, add this in Cloud Console:\n  ${redirectUri}\n` +
+      `  (and for Ledgerman UI: ${env.googleOauthRedirectUri})\n`
   );
   console.log(
-    "Or use Connect Gmail in the Ledgerman UI while `npm run dev` is running.\n"
+    "Prefer Connect Gmail in the Ledgerman UI while the agent is running.\n"
   );
 
-  // CLI-only fallback: temporary listener on the redirect port.
-  // Prefer HTTP callback on the main Express server when possible.
   const code = await new Promise<string>((resolve, reject) => {
     const server = http.createServer((req, res) => {
       try {
-        const url = new URL(req.url ?? "/", `http://localhost:${listenPort}`);
-        if (url.pathname !== callbackPath) {
+        const url = new URL(req.url ?? "/", "http://localhost:3001");
+        if (url.pathname !== "/oauth2callback") {
           res.writeHead(404).end("Not found");
           return;
         }
@@ -208,13 +205,13 @@ async function authorizeWithBrowser(
       }
     });
 
-    server.listen(listenPort, () => {
-      logger.info(`Waiting for OAuth callback on port ${listenPort}`);
+    server.listen(3001, () => {
+      logger.info("Waiting for OAuth callback on port 3001");
     });
     server.on("error", reject);
   });
 
-  const { tokens } = await client.getToken(code);
+  const { tokens } = await oauth.getToken(code);
   client.setCredentials(tokens);
   await saveTokens(tokens);
 }
@@ -247,7 +244,7 @@ export async function getGoogleAuth(options?: {
     throw new GoogleNotConnectedError();
   }
 
-  await authorizeWithBrowser(client, env.googleOauthRedirectUri);
+  await authorizeWithBrowser(client);
   cachedAuth = client;
   return client;
 }
