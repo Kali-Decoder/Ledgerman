@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Ledgerman">
+  <rect width="48" height="48" rx="8" fill="#f6f6f4"/>
+  <rect x="14" y="14" width="20" height="20" rx="3" transform="rotate(45 24 24)" fill="none" stroke="#111" stroke-width="2.2"/>
+  <rect x="20.5" y="20.5" width="7" height="7" transform="rotate(45 24 24)" fill="#e8c547"/>
+</svg>
