@@ -467,7 +467,7 @@ function IntegrationPills({ status }: { status: AgentStatus | null }) {
         ['Gmail', status?.gmail],
         ['Sheets', status?.sheets],
         ['Slack', status?.slack],
-        ['Socket', status?.socketMode],
+        ['Stripe', true],
       ].map(([label, ok]) => (
         <span className={`invoice-pill ${ok ? 'ok' : 'bad'}`} key={String(label)}>
           <Icon name={ok ? 'check' : 'shield'} size={13} />

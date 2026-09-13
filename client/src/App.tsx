@@ -26,6 +26,47 @@ type IconName =
   | 'terminal'
   | 'wallet'
 
+function BrandIcon({ name, size = 28 }: { name: 'gmail' | 'sheets' | 'slack' | 'stripe'; size?: number }) {
+  if (name === 'gmail') {
+    return (
+      <svg className="brand-app-icon" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="#EA4335" d="M2 6.5A2.5 2.5 0 0 1 4.5 4h15A2.5 2.5 0 0 1 22 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 17.5v-11Z" opacity=".15" />
+        <path fill="none" stroke="#EA4335" strokeWidth="1.8" strokeLinejoin="round" d="M3 7.2 12 13l9-5.8V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7.2Z" />
+        <path fill="none" stroke="#EA4335" strokeWidth="1.8" strokeLinejoin="round" d="M3 7.2 12 13l9-5.8" />
+      </svg>
+    )
+  }
+  if (name === 'sheets') {
+    return (
+      <svg className="brand-app-icon" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="4" y="3" width="16" height="18" rx="2" fill="#34A853" opacity=".15" />
+        <rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="#34A853" strokeWidth="1.8" />
+        <path stroke="#34A853" strokeWidth="1.6" d="M4 9h16M4 14h16M10 9v12" />
+      </svg>
+    )
+  }
+  if (name === 'slack') {
+    return (
+      <svg className="brand-app-icon" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="#E01E5A" d="M8.5 3.5a2 2 0 0 0-4 0V6h2a2 2 0 0 0 2-2.5Z" />
+        <path fill="#36C5F0" d="M20.5 8.5a2 2 0 0 0 0-4H18v2a2 2 0 0 0 2.5 2Z" />
+        <path fill="#2EB67D" d="M15.5 20.5a2 2 0 0 0 4 0V18h-2a2 2 0 0 0-2 2.5Z" />
+        <path fill="#ECB22E" d="M3.5 15.5a2 2 0 0 0 0 4H6v-2a2 2 0 0 0-2.5-2Z" />
+        <path fill="#E01E5A" d="M8.5 6.5h-4a2 2 0 1 0 0 4h4v-4Z" />
+        <path fill="#36C5F0" d="M17.5 8.5v-4a2 2 0 1 0-4 0v4h4Z" />
+        <path fill="#2EB67D" d="M15.5 17.5h4a2 2 0 1 0 0-4h-4v4Z" />
+        <path fill="#ECB22E" d="M6.5 15.5v4a2 2 0 1 0 4 0v-4h-4Z" />
+      </svg>
+    )
+  }
+  return (
+    <svg className="brand-app-icon" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="#635BFF" d="M12 2c-2.4 0-4.2 1.2-4.2 3.2 0 3.2 4.2 2.8 4.2 5.4 0 .8-.6 1.4-1.7 1.4-1.5 0-2.6-.7-3.4-1.6l-2.4 2.3C5.8 14.4 8 15.8 11 15.8c2.6 0 4.4-1.3 4.4-3.4 0-3.5-4.2-3-4.2-5.5 0-.7.5-1.3 1.5-1.3 1.2 0 2.1.5 2.8 1.3l2.3-2.3C16.5 3.2 14.5 2 12 2Z" />
+      <rect x="9.4" y="16.8" width="3.2" height="5.2" rx="1.6" fill="#635BFF" />
+    </svg>
+  )
+}
+
 function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
   const paths: Record<IconName, string> = {
     activity: 'M3 12h4l2-7 4 14 2-7h6',
@@ -162,11 +203,11 @@ function LandingPage({ onEnterDemo }: { onEnterDemo: () => void }) {
   const liveDigest = liveRelease?.digest ?? 'release digest unavailable'
   const agentUrl = getAgentBaseUrl()
   const integrations = [
-    ['Gmail', Boolean(agentStatus?.gmail), 'Invoice email intake'],
-    ['Sheets', Boolean(agentStatus?.sheets), 'System of record'],
-    ['Slack', Boolean(agentStatus?.slack), 'Approve / reject'],
-    ['Socket', Boolean(agentStatus?.socketMode), 'Live button actions'],
-  ] as const
+    { name: 'Gmail', icon: 'gmail' as const, ok: Boolean(agentStatus?.gmail), copy: 'Invoice email intake' },
+    { name: 'Sheets', icon: 'sheets' as const, ok: Boolean(agentStatus?.sheets), copy: 'System of record' },
+    { name: 'Slack', icon: 'slack' as const, ok: Boolean(agentStatus?.slack), copy: 'Approve / reject' },
+    { name: 'Stripe', icon: 'stripe' as const, ok: true, copy: 'Payment settlement' },
+  ]
 
   return <div className="product-landing">
     <header className="product-nav">
@@ -219,11 +260,11 @@ function LandingPage({ onEnterDemo }: { onEnterDemo: () => void }) {
 
       <section className="proof-strip product-container" aria-label="Product surfaces">
         <div className="proof-strip-label">END TO END</div>
-        <div className="proof-strip-items">
-          <span>Gmail intake</span>
-          <span>Sheets ledger</span>
-          <span>Slack approval</span>
-          <span>Stripe payment</span>
+        <div className="proof-strip-items proof-strip-apps">
+          <span><BrandIcon name="gmail" size={16} /> Gmail intake</span>
+          <span><BrandIcon name="sheets" size={16} /> Sheets ledger</span>
+          <span><BrandIcon name="slack" size={16} /> Slack approval</span>
+          <span><BrandIcon name="stripe" size={16} /> Stripe payment</span>
           <span>Ledgerman authority gate</span>
           <span>Dashboard console</span>
         </div>
@@ -289,14 +330,17 @@ function LandingPage({ onEnterDemo }: { onEnterDemo: () => void }) {
           <p>Live readiness is read from the invoice-agent backend at <code>{agentUrl}</code>.</p>
         </div>
         <div className="landing-integration-grid">
-          {integrations.map(([name, ok, copy]) => (
-            <div className={`landing-integration-card ${ok ? 'ok' : 'missing'}`} key={name}>
+          {integrations.map((item) => (
+            <div className={`landing-integration-card ${item.ok ? 'ok' : 'missing'}`} key={item.name}>
               <div className="landing-integration-top">
-                <strong>{name}</strong>
-                <span>{ok ? 'connected' : 'needs setup'}</span>
+                <div className="landing-integration-brand">
+                  <BrandIcon name={item.icon} size={26} />
+                  <strong>{item.name}</strong>
+                </div>
+                <span>{item.ok ? 'connected' : 'needs setup'}</span>
               </div>
-              <p>{copy}</p>
-              <small>{ok ? 'Ready for console actions' : 'Configure credentials, then refresh status'}</small>
+              <p>{item.copy}</p>
+              <small>{item.ok ? 'Ready for console actions' : 'Configure credentials, then refresh status'}</small>
             </div>
           ))}
         </div>

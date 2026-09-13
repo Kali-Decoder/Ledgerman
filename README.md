@@ -48,12 +48,22 @@ Repo is public for judges: [github.com/Kali-Decoder/Ledgerman](https://github.co
 
 ## External apps used
 
-| App | How Ledgerman uses it |
-|-----|------------------------|
-| **Gmail** | OAuth connect + search for invoice/receipt/billing emails |
-| **Google Sheets** | System of record for invoice rows, status, duplicates, payment fields |
-| **Slack** | Block Kit Approve / Reject buttons via Socket Mode |
-| **Stripe (shaped)** | PaymentIntent-style settlement after approve (hackathon simulation — no live card charges unless you add a Stripe secret key) |
+<p align="center">
+  <a href="https://gmail.com"><img src="https://cdn.simpleicons.org/gmail/EA4335" alt="Gmail" height="36" /></a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="https://sheets.google.com"><img src="https://cdn.simpleicons.org/googlesheets/34A853" alt="Google Sheets" height="36" /></a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="https://slack.com"><img src="https://cdn.simpleicons.org/slack/4A154B" alt="Slack" height="36" /></a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="https://stripe.com"><img src="https://cdn.simpleicons.org/stripe/635BFF" alt="Stripe" height="36" /></a>
+</p>
+
+| | App | How Ledgerman uses it |
+| :---: | --- | --- |
+| <img src="https://cdn.simpleicons.org/gmail/EA4335" alt="" width="22" height="22" /> | **Gmail** | OAuth connect + search for invoice/receipt/billing emails |
+| <img src="https://cdn.simpleicons.org/googlesheets/34A853" alt="" width="22" height="22" /> | **Google Sheets** | System of record for invoice rows, status, duplicates, payment fields |
+| <img src="https://cdn.simpleicons.org/slack/4A154B" alt="" width="22" height="22" /> | **Slack** | Block Kit Approve / Reject buttons via Socket Mode |
+| <img src="https://cdn.simpleicons.org/stripe/635BFF" alt="" width="22" height="22" /> | **Stripe (shaped)** | PaymentIntent-style settlement after approve (hackathon simulation — no live card charges unless you add a Stripe secret key) |
 
 Supporting stack: Node.js, Express, TypeScript, React (Vite), Google APIs, Slack Web API + Socket Mode.
 

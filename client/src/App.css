@@ -1069,7 +1069,11 @@ code { color: var(--olive-char); font: 400 11px/17px var(--mono); }
 .landing-integration-card { padding: 22px; border: 1px solid var(--ash); border-radius: 8px; background: var(--paper); }
 .landing-integration-card.ok { border-color: var(--khaki); background: var(--bone); }
 .landing-integration-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.landing-integration-brand { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
+.landing-integration-brand .brand-app-icon { flex-shrink: 0; }
 .landing-integration-top strong { color: #000; font: 500 14px/1.2 var(--mono); }
+.proof-strip-apps span { display: inline-flex; align-items: center; gap: 8px; }
+.proof-strip-apps .brand-app-icon { flex-shrink: 0; }
 .landing-integration-top span { color: var(--lichen); font: 500 10px/1 var(--mono); text-transform: uppercase; }
 .landing-integration-card.ok .landing-integration-top span { color: var(--olive-char); }
 .landing-integration-card p { margin: 0; color: #000; font: 400 18px/1.2 var(--serif); letter-spacing: -.03em; }
