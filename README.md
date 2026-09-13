@@ -30,11 +30,11 @@ Gmail  →  Extract  →  Google Sheets  →  Slack Approve/Reject  →  Payment
 
 ## Two-minute demo
 
-**Demo video (≤ 2 minutes):**  
-➡️ **[Watch the demo](https://YOUR_DEMO_LINK_HERE)**  
+[![Watch the Ledgerman demo](https://img.youtube.com/vi/SQ8a3n6i5Eg/hqdefault.jpg)](https://youtu.be/SQ8a3n6i5Eg)
 
-> **Team action required:** replace `https://YOUR_DEMO_LINK_HERE` with your unlisted YouTube / Loom / Drive link (anyone-with-link).  
-> Keep the GitHub repo **public** so judges can open code + README without a login wall.
+➡️ **[Watch the 2-minute demo on YouTube](https://youtu.be/SQ8a3n6i5Eg)**
+
+Repo is public for judges: [github.com/Kali-Decoder/Ledgerman](https://github.com/Kali-Decoder/Ledgerman)
 
 ### What the demo shows
 

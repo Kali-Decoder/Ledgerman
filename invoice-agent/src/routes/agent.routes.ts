@@ -49,6 +49,64 @@ router.get("/status", async (_req, res) => {
 });
 
 /**
+ * GET /agent/auth/setup — shows the exact redirect URI Google must allow.
+ */
+router.get("/auth/setup", (_req, res) => {
+  const redirectUri = env.googleOauthRedirectUri;
+  const origins = [
+    `http://localhost:${env.port}`,
+    env.uiOrigin.replace(/\/$/, ""),
+  ];
+  res.type("html").send(`<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Ledgerman · Fix redirect_uri_mismatch</title>
+  <style>
+    body { font: 15px/1.5 system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; color: #111; }
+    code, pre { background: #f4f4f1; padding: 2px 6px; border-radius: 4px; }
+    pre { padding: 12px; overflow: auto; }
+    .box { border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin: 16px 0; }
+    .warn { background: #fff6e8; border-color: #e6c98a; }
+    a.button { display: inline-block; margin: 8px 8px 0 0; padding: 10px 14px; background: #111; color: #fff; text-decoration: none; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <h1>Fix Google Error 400: redirect_uri_mismatch</h1>
+  <p>Ledgerman is requesting this callback. It must appear <strong>exactly</strong> under
+  <strong>Authorized redirect URIs</strong> (not JavaScript origins) on your OAuth client.</p>
+
+  <div class="box warn">
+    <strong>Copy this URI:</strong>
+    <pre id="uri">${redirectUri}</pre>
+    <button type="button" onclick="navigator.clipboard.writeText('${redirectUri}')">Copy</button>
+  </div>
+
+  <ol>
+    <li>Open <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noreferrer">Google Cloud → Credentials</a></li>
+    <li>Click the OAuth client whose Client ID ends with <code>pp0ci</code> (or matches your <code>credentials.json</code>)</li>
+    <li>Confirm Application type is <strong>Web application</strong></li>
+    <li>Under <strong>Authorized redirect URIs</strong> → <strong>Add URI</strong> → paste the URI above</li>
+    <li>Optional under <strong>Authorized JavaScript origins</strong>, add:
+      <pre>${origins.join("\n")}</pre>
+    </li>
+    <li>Click <strong>Save</strong>, wait 1–2 minutes, then try again</li>
+  </ol>
+
+  <div class="box">
+    <p>Also add the CLI fallback URI if you use terminal scripts:</p>
+    <pre>http://localhost:3001/oauth2callback</pre>
+  </div>
+
+  <p>
+    <a class="button" href="/agent/auth/google?next=/demo">Try Connect Gmail again</a>
+    <a class="button" href="${env.uiOrigin.replace(/\/$/, "")}/demo">Back to Ledgerman</a>
+  </p>
+</body>
+</html>`);
+});
+
+/**
  * GET /agent/auth/google — start Gmail OAuth (redirect to Google).
  * Use from Ledgerman: Connect Gmail.
  */
@@ -62,6 +120,9 @@ router.get("/auth/google", async (req, res) => {
       "base64url"
     );
     const url = await getGoogleAuthUrl(state);
+    logger.info("Starting Google OAuth", {
+      redirectUri: env.googleOauthRedirectUri,
+    });
     res.redirect(url);
   } catch (err) {
     logger.error("auth google start failed", err);
