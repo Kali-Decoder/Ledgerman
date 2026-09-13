@@ -1,0 +1,4 @@
+:root { font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; color: #000; background: #f6f6f4; font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
+html { background: #f6f6f4; }
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+button:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid #000; outline-offset: 3px; }
