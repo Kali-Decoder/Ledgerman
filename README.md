@@ -28,7 +28,7 @@ Gmail  →  Extract  →  Google Sheets  →  Slack Approve/Reject  →  Payment
 
 ---
 
-## Two-minute demo
+## Demo Video
 
 [![Watch the Ledgerman demo](https://img.youtube.com/vi/SQ8a3n6i5Eg/hqdefault.jpg)](https://youtu.be/SQ8a3n6i5Eg)
 
@@ -64,7 +64,7 @@ Supporting stack: Node.js, Express, TypeScript, React (Vite), Google APIs, Slack
 | Resource | Link / note |
 |----------|-------------|
 | **Source code** | [github.com/Kali-Decoder/Ledgerman](https://github.com/Kali-Decoder/Ledgerman) — set the repo to **Public** |
-| **Demo video** | Link in [Two-minute demo](#two-minute-demo) — unlisted + shareable |
+| **Demo video** | Link in [Demo Video](#Demo-Video) — unlisted + shareable |
 | **Run locally** | Follow [Setup instructions](#setup-instructions) below (needs your own Google + Slack credentials) |
 
 Do **not** commit secrets (`.env`, `credentials.json`, `token.json`). Judges can reproduce the flow with their own API credentials using this README.
