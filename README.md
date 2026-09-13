@@ -76,6 +76,7 @@ Supporting stack: Node.js, Express, TypeScript, React (Vite), Google APIs, Slack
 | **Source code** | [github.com/Kali-Decoder/Ledgerman](https://github.com/Kali-Decoder/Ledgerman) — set the repo to **Public** |
 | **Demo video** | Link in [Demo Video](#Demo-Video) — unlisted + shareable |
 | **Run locally** | Follow [Setup instructions](#setup-instructions) below (needs your own Google + Slack credentials) |
+| **UI test checklist** | [5-minute UI checklist](#5-minute-ui-checklist-for-judges) |
 
 Do **not** commit secrets (`.env`, `credentials.json`, `token.json`). Judges can reproduce the flow with their own API credentials using this README.
 
@@ -178,6 +179,24 @@ Open **http://localhost:5173** → **Connect Gmail** → Track → Slack Approve
 |-------|---------|
 | `/` | Landing |
 | `/demo` | Operator console |
+
+---
+
+## 5-minute UI checklist (for judges)
+
+Assumes credentials are already configured and both servers are running (`invoice-agent` on `:3000`, `client` on `:5173`). UI-only — no CLI required.
+
+1. Open **http://localhost:5173** — confirm Ledgerman landing loads.  
+2. Click **Connect Gmail** → complete Google consent → land on `/demo` with Gmail connected (email shown).  
+3. If Track did not auto-run, click **Track Gmail** — invoice rows appear under **Invoices** / Google Sheets.  
+4. Open **Invoices** → select a `pending` row → click **Send to Slack**.  
+5. In Slack (`#invoices` or your configured channel) → click **Approve** (or **Reject**).  
+6. Return to Ledgerman → **Refresh** — status is `paid` (after Approve) or `rejected`.  
+7. Open **Pipeline** — confirm track / Slack / payment events in the activity log.  
+
+**Pass criteria:** Gmail → Sheets → Slack decision → sheet status update, all visible from the console without using terminal scripts.
+
+**Optional:** Track the same invoice again to confirm duplicate handling.
 
 ---
 
