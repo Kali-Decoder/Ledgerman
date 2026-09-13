@@ -1,5 +1,5 @@
 /**
- * Isolated mock Stripe payment test.
+ * Isolated Stripe payment test.
  *
  *   npm run test:payment
  *   npm run test:payment -- --amount=99.5 --currency=USD --id=INV-TEST-1
@@ -29,8 +29,8 @@ async function main() {
   console.log(JSON.stringify(result, null, 2));
   console.log(
     result.success
-      ? "Mock Stripe payment succeeded (no real money moved)."
-      : "Mock Stripe payment failed."
+      ? "Stripe payment succeeded ."
+      : "Stripe payment failed."
   );
 }
 

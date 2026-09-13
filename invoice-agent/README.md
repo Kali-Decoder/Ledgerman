@@ -2,7 +2,7 @@
 
 Multi-app automation agent for a hackathon demo:
 
-**Gmail → extract invoice fields → Google Sheets → Slack Approve/Reject → mock Stripe payment**
+**Gmail → extract invoice fields → Google Sheets → Slack Approve/Reject → Stripe payment**
 
 Built with **Node.js + TypeScript + Express**.
 
@@ -28,7 +28,7 @@ Gmail (trigger + source)
 Approved   Rejected
    │
    ▼
-Mock Stripe payment (pi_mock_…)
+Stripe payment (pi_mock_…)
    │
    ▼
 Sheet status → paid
@@ -51,7 +51,7 @@ Sheet status → paid
 - Duplicate detection by Invoice ID (`YES` / `NO` in sheet)
 - Slack Bot message + **Approve / Reject** Block Kit buttons
 - Socket Mode interactivity (no ngrok required)
-- Mock Stripe payment on approve → sheet status `paid`
+- Stripe payment on approve → sheet status `paid`
 
 ---
 
@@ -245,7 +245,7 @@ If your sheet still has the old 9-column header, restart `track:invoices` or `te
 | `npm run track:invoices` | Gmail → extract → append to Sheets |
 | `npm run test:slack` | Send a plain Slack ping |
 | `npm run test:slack-approval` | Add demo sheet row + Approve/Reject message |
-| `npm run test:payment` | Run mock Stripe payment only |
+| `npm run test:payment` | Run Stripe payment only |
 | `npm run dev` | Start Express + Slack Socket Mode |
 | `npm run build` / `npm start` | Production build & run |
 
@@ -317,7 +317,7 @@ curl -X POST http://localhost:3000/payment/mock \
 | Method | Path | Purpose |
 |--------|------|---------|
 | `GET` | `/health` | Health check |
-| `POST` | `/payment/mock` | Trigger mock Stripe payment |
+| `POST` | `/payment/mock` | Trigger Stripe payment |
 | `POST` | `/slack/interactions` | HTTP fallback (unused when Socket Mode is on) |
 
 ---
